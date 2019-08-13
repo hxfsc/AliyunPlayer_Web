@@ -8,25 +8,32 @@ import { parseDom } from 'utils'
 export default class BulletScreenComponent {
   /**
    * @constructor 跑马灯构造函数
-   * @param {String text 跑马灯内容}
+   * @param {Array bulletList {text: 内容, style: 单独样式 }跑马灯内容}
    * @param {Object style 跑马灯样式}
    * param {String bulletPosition 跑马灯所在的位置, 可能的值 'top', 'bottom' , 'random, 默认为 'random'}
    */
-  constructor (text, style, bulletPosition = 'random') {
-    this.text = text
-    this.style = style || { fontSize: '14px', color: '#fff' }
-    this.html = parseDom(bulletHtml)
-    // this.html.style.animationPlayState = 'paused'
+  constructor (bulletList, style={fontSize:'16px', color: '#00c1de'}, bulletPosition = 'random') {
+    this.bulletList = bulletList
+    this.style = style
     this.bulletPosition = bulletPosition
+    this.html = parseDom(bulletHtml)
   }
 
   createEl (el, player) {
-    this.html.innerText = this.text
+    let bulletList = []
+    for(let bullet of this.bulletList){
+      let [text, style] = bullet
+      let bulletEl = document.createElement("p")
+      bulletEl.innerText = text
+      Object.keys(style).forEach(key=>bulletEl.style[key]= style[key])
+      this.html.appendChild(bulletEl)
+    }
+    
     el.appendChild(this.html)
   }
 
   ready (player, e) {
-    console.log(player.getOptions())
+    
     if (player.getOptions().autoplay === false) {
       this.html.style.animationPlayState = 'paused'
     }
@@ -53,7 +60,6 @@ export default class BulletScreenComponent {
   }
 
   playing (player, e) {
-    console.log('playering')
     this.html.style.animationPlayState = 'running'
   }
 
@@ -83,7 +89,6 @@ export default class BulletScreenComponent {
   }
 
   pause (player, e) {
-    console.log('pause')
     this.html.style.animationPlayState = 'paused'
   }
 
